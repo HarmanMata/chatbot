@@ -1,2 +1,6 @@
 streamlit
-openai
+google-generativeai
+requests
+pandas
+numpy
+
