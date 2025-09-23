@@ -53,7 +53,7 @@ def ai_answer(user_input):
 # -----------------------------
 # Dark Theme CSS
 # -----------------------------
-st.set_page_config(page_title="AI Chat", layout="centered")
+st.set_page_config(page_title="AI Chatbot", layout="centered")
 st.markdown("""
 <style>
 body { background-color:#0d1117; color:#e6edf3; font-family:Inter, sans-serif; }
