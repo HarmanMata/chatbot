@@ -36,19 +36,22 @@ def real_time_search(query):
     except Exception as e:
         return f"⚠️ Web search failed: {e}"
 
-def summarize_web_results(results, query):
-    if results.startswith("⚠️"):
-        return results
-    prompt = f"Summarize this for the question: {query}\n\n{results}"
-    return model.generate_content(prompt).text.strip()
-
-def ai_answer(user_input):
-    # Get the last 5 conversations to include in the prompt
+def ai_answer_stream(user_input):
     history_for_prompt = st.session_state.chat_history[-5:]
     history_string = "\n".join([f"{r}: {t}" for r,t,ts in history_for_prompt])
     
     prompt = f"{history_string}\nUser: {user_input}\nAI:"
-    return model.generate_content(prompt).text.strip()
+    return model.generate_content(prompt, stream=True)
+
+def summarize_web_results_stream(results, query):
+    if results.startswith("⚠️"):
+        yield type('obj', (object,), {'text': results})()
+        return
+        
+    prompt = f"Summarize this for the question: {query}\n\n{results}"
+    response_generator = model.generate_content(prompt, stream=True)
+    for chunk in response_generator:
+        yield chunk
 
 # -----------------------------
 # Dark Theme CSS
@@ -76,16 +79,9 @@ st.markdown("<hr style='border:1px solid #30363d;'>", unsafe_allow_html=True)
 # -----------------------------
 # Render Chat History
 # -----------------------------
-st.markdown('<div class="chat-box">', unsafe_allow_html=True)
 for role, text, ts in st.session_state.chat_history:
-    css = "user" if role=="User" else "ai"
-    st.markdown(f"""
-        <div class="msg {css}">
-            {text}
-            <div class="meta">{role} · {ts}</div>
-        </div>
-    """, unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)
+    with st.chat_message(role):
+        st.write(text)
 
 # -----------------------------
 # Mode Selector
@@ -95,21 +91,39 @@ st.session_state.mode = st.selectbox("Response mode:", ["AI answer", "Web + summ
 # -----------------------------
 # Input Box (Enter to Send)
 # -----------------------------
-with st.form(key='chat_form', clear_on_submit=True):
-    user_input = st.text_input("Type your question...", "")
-    submit_button = st.form_submit_button("Send")
-
-if submit_button and user_input:
+if prompt := st.chat_input("Type your question..."):
     ts = datetime.now().strftime("%H:%M")
-    st.session_state.chat_history.append(("User", user_input, ts))
+    
+    # Append the user's message to the session history
+    st.session_state.chat_history.append(("User", prompt, ts))
+    
+    # Display the user's message immediately
+    with st.chat_message("User"):
+        st.write(prompt)
 
-    if st.session_state.mode == "AI answer":
-        ans = ai_answer(user_input)
-    else:
-        results = real_time_search(user_input)
-        ans = summarize_web_results(results, user_input)
+    # Create a new chat message container for the AI's response
+    with st.chat_message("AI"):
+        
+        # Determine the response generator based on the selected mode
+        if st.session_state.mode == "AI answer":
+            response_generator = ai_answer_stream(prompt)
+        else:
+            results = real_time_search(prompt)
+            response_generator = summarize_web_results_stream(results, prompt)
 
-    st.session_state.chat_history.append(("AI", ans, ts))
+        # Stream the response from the generator
+        full_response = ""
+        placeholder = st.empty()
+        for chunk in response_generator:
+            if hasattr(chunk, 'text'):
+                full_response += chunk.text
+                placeholder.markdown(full_response + "▌")  # Add a typing cursor for visual effect
+        
+        # Once streaming is done, remove the cursor and update the final response
+        placeholder.markdown(full_response)
+    
+    # Append the complete, final response to the session history
+    st.session_state.chat_history.append(("AI", full_response, ts))
     st.rerun()
 
 # -----------------------------
