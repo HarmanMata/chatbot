@@ -8,7 +8,7 @@ from datetime import datetime
 # API Keys
 # -----------------------------
 GENAI_API_KEY = "AIzaSyDLaa1Ru5klYJgPVbWWZwRia__2NUFo2Gs"
-# SERPAPI_KEY = "fe0dabbd93be11974bed64d0b151446d123608e504ec55f2a9b98cf62319497f"
+SERPAPI_KEY = "fe0dabbd93be11974bed64d0b151446d123608e504ec55f2a9b98cf62319497f"
 
 genai.configure(api_key=GENAI_API_KEY)
 model = genai.GenerativeModel("gemini-1.5-flash")
