@@ -1,6 +1,10 @@
 streamlit
 google-generativeai
+google-ai-generativelanguage>=0.7.0
 requests
-pandas
-numpy
+pypdf2
+langchain
+langchain-community
+faiss-cpu
+langchain-google-genai
 
