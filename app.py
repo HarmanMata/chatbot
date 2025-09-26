@@ -148,7 +148,7 @@ def create_rag_prompt(user_question, api_key):
 # -----------------------------
 st.set_page_config(
     page_title="AI Chatbot",
-    page_icon="🤖",
+    page_icon="",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
