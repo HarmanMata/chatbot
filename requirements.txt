@@ -1,9 +1,9 @@
 streamlit
-google-genai
-requests 
-pypdf2 
-langchain 
-langchain-community 
-faiss-cpu 
-langchain-google-genai 
+google-generativeai
+requests
+pypdf2
+langchain
+langchain-community
+faiss-cpu
+langchain-google-genai
 python-dotenv
