@@ -148,7 +148,7 @@ def create_rag_prompt(user_question, api_key):
 # -----------------------------
 st.set_page_config(
     page_title="AI Chatbot",
-    page_icon="",
+    page_icon="🤖",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
@@ -253,7 +253,7 @@ with st.sidebar:
 # -----------------------------
 col1, col2 = st.columns([4, 1])
 with col1:
-    st.markdown("<h2 style='text-align:left; color:#e6edf3;'> AI Chatbot</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align:left; color:#e6edf3;'>AI Chatbot</h2>", unsafe_allow_html=True)
 with col2:
     if st.button("Clear chat"):
         st.session_state.chat_history = []
